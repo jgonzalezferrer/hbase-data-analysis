@@ -1,5 +1,14 @@
 package master2016;
 
+import java.io.IOException;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.util.Bytes;
 
 public class HbaseApp {
 
@@ -62,6 +71,34 @@ public class HbaseApp {
 		languages = args[5];
 		dataFolder = args[6];
 		outputFolder = args[7];
+		
+		if(mode.equals("4")){
+			// Create table and column
+			Configuration conf = HBaseConfiguration.create();
+			try {
+				HBaseAdmin admin = new HBaseAdmin(conf);
+				
+				byte[] TABLE = Bytes.toBytes("TABLE_NAME");
+				byte[] CF = Bytes.toBytes("DATA_NAME");
+				
+				// TODO: what happens if the table does already exist?
+				HTableDescriptor table = new HTableDescriptor(TableName.valueOf(TABLE));
+				
+				HColumnDescriptor family = new HColumnDescriptor(CF);
+				// TODO: correct number of max versions allowed.
+				// Definition: limit the number of version of each column
+				family.setMaxVersions(10);  // Default is 3. 
+				
+				table.addFamily(family);
+				admin.createTable(table);
+				
+				admin.close();
+				
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
 	}
 }
