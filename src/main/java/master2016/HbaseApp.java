@@ -14,6 +14,7 @@ import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 
 public class HbaseApp {
@@ -108,13 +109,40 @@ public class HbaseApp {
 			HTable table2 = new	HTable(TableName.valueOf(TABLE),conn);
 			
 			// TODO: open the file, for each of the `languages` (lang.out).
+			// TODO: format of the each sentence? (in the example there are spaces).
 			String fileName = "en.out";
 			File filePath = new File(dataFolder+"/"+fileName);
 			BufferedReader reader = new BufferedReader(new FileReader(filePath));
 
 			String line;
 			while((line = reader.readLine()) != null){
-				System.out.println(line);
+				String[] lines = line.split(",");
+				
+				
+				/* How to select the key?
+				 * 
+				 * 1) Rows in HBase are sorted lexicographically by row key. This design optimizes for scans, 
+				 * allowing you to store related rows, or rows that will be read together, near each other    .
+				 *                     
+				 * 2) If you are not using a filter against rowkey column in your query, your rowkey design may be wrong. 
+				 * The row key should be designed to contain the information you need to find specific subsets of data.
+				 */
+				
+				String timeStamp = lines[0];
+				String lang = lines[1];
+				String hashtag1 = lines[2];
+				String valueHashtag1 = lines[3];
+				String hashtag2 = lines[4];
+				String valueHashtag2 = lines[5];
+				String hashtag3 = lines[6];
+				String valueHashtag3 = lines[7];
+				
+				// TODO: how to combine two keys in order to define the row key.
+				//byte[] key = Bytes.toBytes(lang+timeStamp);
+				//Put put = new Put(key);
+				
+				
+				
 			}
 		}
 
