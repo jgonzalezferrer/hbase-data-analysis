@@ -12,6 +12,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.target>1.7</maven.compiler.target>
+	<maven.compiler.source>1.7</maven.compiler.source>
   </properties>
 
   <dependencies>
@@ -39,8 +41,6 @@
 					</execution>
 				</executions>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
 					<configurationSourceDirectory>src/main/resources</configurationSourceDirectory>
 					<includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
 					<copyConfigurationDirectory>true</copyConfigurationDirectory>
