@@ -35,14 +35,14 @@ public class KeyGenerator {
 		int X = 8;
 		int Y = 2;
 		byte[] key = new byte[X+Y];
-
+		
 		System.arraycopy(Bytes.toBytes(timeStamp), 0, key, 0, X);
 		for (int i = X; i < X+Y; i++){
 			key[i] = (byte)-255;
 		}
 		return key;
 	}
-
+	
 	public static byte[] generateEndKey(Long timeStamp) {
 		int X = 8;
 		int Y = 2;

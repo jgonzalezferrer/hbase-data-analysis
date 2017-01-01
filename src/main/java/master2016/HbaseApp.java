@@ -85,20 +85,24 @@ public class HbaseApp {
 		endTS = args[3];
 		N = args[4];
 		languages = args[5];
+		String [] languagesList = languages.split(",");
 		dataFolder = args[6];
 		outputFolder = args[7];
+
+		String tableName = "TABLE_NAME";
+		String familyName = "d";
+
+				
 
 
 		if(mode.equals("4")){
 
-			String tableName = "TABLE_NAME";
-			String familyName = "d";
-
 			HbaseTable.createTable(tableName, familyName);
+			HTable table = HbaseTable.open(tableName);	
 
-			HTable table = HbaseTable.open(tableName);				
 
-			String [] languagesList = languages.split(",");
+
+
 			for(int i=0; i<languagesList.length; i++){
 
 				//String fileName = "en.out";
@@ -146,10 +150,43 @@ public class HbaseApp {
 				}			
 
 				reader.close();
-				table.close();
+
 			}
+			table.close();
+
 		}
 
+		else if(mode.equals("2")){
+			byte[] startKey = KeyGenerator.generateStartKey(new Long(startTS));
+			byte[] endKey = KeyGenerator.generateEndKey(new Long(endTS));
+
+
+			Scan scan = new Scan(startKey, endKey);
+			HTable table = HbaseTable.open(tableName);
+
+			for(int i=0; i<languagesList.length; i++){
+				String lang = languagesList[i];
+
+				RegexStringComparator endsWithLang = new RegexStringComparator(lang+"$");
+				RowFilter langFilter = new RowFilter(CompareOp.EQUAL, endsWithLang);
+				scan.setFilter(langFilter);
+
+					
+				ResultScanner rs = table.getScanner(scan);
+
+				Result res = rs.next();
+				while (res!=null && !res.isEmpty()){
+					// Do something with the result.
+
+					byte[] valueResult = res.getValue(Bytes.toBytes(familyName), Bytes.toBytes("HASHTAG1"));
+					System.out.println(Bytes.toLong(res.getRow())+Bytes.toString(valueResult));
+					res = rs.next();
+				} 
+			}
+			table.close();
+			
+		}
+		
 
 	}
 }
