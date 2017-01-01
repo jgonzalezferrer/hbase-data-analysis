@@ -10,12 +10,15 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
+
 
 public class HbaseApp {
 
@@ -81,6 +84,7 @@ public class HbaseApp {
 		
 
 		if(mode.equals("4")){
+		
 			// Create table and column
 			Configuration conf = HBaseConfiguration.create();
 
@@ -88,6 +92,11 @@ public class HbaseApp {
 
 			byte[] TABLE = Bytes.toBytes("TABLE_NAME");
 			
+			if(admin.tableExists(TableName.valueOf(TABLE))) {
+					admin.disableTable(TableName.valueOf(TABLE));
+					admin.deleteTable(TableName.valueOf(TABLE));
+			}
+				
 			
 			/*
 			 * Physically, all column family members are stored together on the filesystem. 
@@ -113,8 +122,8 @@ public class HbaseApp {
 			byte[] COL_FREQ1 = Bytes.toBytes("FREQ1");
 			byte[] COL_FREQ2 = Bytes.toBytes("FREQ2");
 			byte[] COL_FREQ3 = Bytes.toBytes("FREQ3");
-
-			// TODO: what happens if the table does already exist?
+			
+			
 			HTableDescriptor table = new HTableDescriptor(TableName.valueOf(TABLE));
 
 			HColumnDescriptor family = new HColumnDescriptor(CF);
@@ -123,6 +132,9 @@ public class HbaseApp {
 			family.setMaxVersions(10);  // Default is 3. 
 
 			table.addFamily(family);
+			
+			
+				
 			admin.createTable(table);
 
 			admin.close();
@@ -179,8 +191,16 @@ public class HbaseApp {
 				put.add(CF, COL_FREQ3, Bytes.toBytes(freqHashtag3));
 				
 				table2.put(put);
+				
+				Get get = new Get(key);
+				Result result = table2.get(get);
+				
+				byte[] valueResult=result.getValue(CF,  COL_HASHTAG1);
+				System.out.println("Result = " + Bytes.toString(valueResult));
 							
 			}
+			
+			
 			
 			reader.close();
 			table2.close();
