@@ -130,13 +130,9 @@ public class HbaseApp {
 			// TODO: correct number of max versions allowed.
 			// Definition: limit the number of version of each column
 			family.setMaxVersions(10);  // Default is 3. 
-
-			table.addFamily(family);
-			
-			
+			table.addFamily(family);			
 				
 			admin.createTable(table);
-
 			admin.close();
 
 
@@ -156,7 +152,7 @@ public class HbaseApp {
 				
 				String[] lines = line.split(",");
 				
-				String timeStamp = lines[0];
+				Long timeStamp = new Long(lines[0]);
 				String lang = lines[1];
 				String hashtag1 = lines[2];
 				String freqHashtag1 = lines[3];
@@ -192,15 +188,14 @@ public class HbaseApp {
 				
 				table2.put(put);
 				
+				// DEBUG
 				Get get = new Get(key);
 				Result result = table2.get(get);
 				
 				byte[] valueResult=result.getValue(CF,  COL_HASHTAG1);
 				System.out.println("Result = " + Bytes.toString(valueResult));
 							
-			}
-			
-			
+			}			
 			
 			reader.close();
 			table2.close();
