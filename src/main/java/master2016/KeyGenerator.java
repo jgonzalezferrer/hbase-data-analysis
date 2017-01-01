@@ -3,7 +3,7 @@ package master2016;
 import org.apache.hadoop.hbase.util.Bytes;
 
 public class KeyGenerator {
-	
+
 	public static byte[] generateKey(Long timeStamp, String lang){
 		/* TODO: discuss the number of bytes.
 		 * Structure of the key:
@@ -28,6 +28,29 @@ public class KeyGenerator {
 		 */
 		System.arraycopy(Bytes.toBytes(timeStamp), 0, key, 0, X);
 		System.arraycopy(Bytes.toBytes(lang), 0, key, X, Y);
+		return key;
+	}
+
+	public static byte[] generateStartKey(Long timeStamp) {
+		int X = 8;
+		int Y = 2;
+		byte[] key = new byte[X+Y];
+
+		System.arraycopy(Bytes.toBytes(timeStamp), 0, key, 0, X);
+		for (int i = X; i < X+Y; i++){
+			key[i] = (byte)-255;
+		}
+		return key;
+	}
+
+	public static byte[] generateEndKey(Long timeStamp) {
+		int X = 8;
+		int Y = 2;
+		byte[] key = new byte[X+Y];
+		System.arraycopy(Bytes.toBytes(timeStamp), 0, key, 0, X);
+		for (int i = X; i < X+Y; i++){
+			key[i] = (byte)255;
+		}
 		return key;
 	}
 
