@@ -87,9 +87,32 @@ public class HbaseApp {
 			HBaseAdmin admin = new HBaseAdmin(conf);
 
 			byte[] TABLE = Bytes.toBytes("TABLE_NAME");
+			
+			
+			/*
+			 * Physically, all column family members are stored together on the filesystem. 
+			 * 
+			 * Try to make do with one column family if you can in your schemas. 
+			 * Only introduce a second and third column family in the case where data access is usually column scoped; 
+			 * i.e. you query one column family or the other but usually not both at the one time.
+			 * 
+			 * 
+			 * 6.3.2.2. Attributes
+			 * Although verbose attribute names (e.g., "myVeryImportantAttribute") are easier to read, prefer shorter attribute names (e.g., "via") to store in HBase.
+			 */
+			
 			// * 6.3.2.1. Column Families
 			// * Try to keep the ColumnFamily names as small as possible, preferably one character (e.g. "d" for data/default).
 			byte[] CF = Bytes.toBytes("d");
+			
+			// Column names
+			byte[] COL_HASHTAG1 = Bytes.toBytes("HASHTAG1");
+			byte[] COL_HASHTAG2 = Bytes.toBytes("HASHTAG2");
+			byte[] COL_HASHTAG3 = Bytes.toBytes("HASHTAG3");
+			
+			byte[] COL_FREQ1 = Bytes.toBytes("FREQ1");
+			byte[] COL_FREQ2 = Bytes.toBytes("FREQ2");
+			byte[] COL_FREQ3 = Bytes.toBytes("FREQ3");
 
 			// TODO: what happens if the table does already exist?
 			HTableDescriptor table = new HTableDescriptor(TableName.valueOf(TABLE));
@@ -118,7 +141,17 @@ public class HbaseApp {
 
 			String line;
 			while((line = reader.readLine()) != null){
+				
 				String[] lines = line.split(",");
+				
+				String timeStamp = lines[0];
+				String lang = lines[1];
+				String hashtag1 = lines[2];
+				String freqHashtag1 = lines[3];
+				String hashtag2 = lines[4];
+				String freqHashtag2 = lines[5];
+				String hashtag3 = lines[6];
+				String freqHashtag3 = lines[7];
 				
 				
 				/* How to select the key?
@@ -130,35 +163,27 @@ public class HbaseApp {
 				 * The row key should be designed to contain the information you need to find specific subsets of data.
 				 */
 				
-				String timeStamp = lines[0];
-				String lang = lines[1];
-				String hashtag1 = lines[2];
-				String valueHashtag1 = lines[3];
-				String hashtag2 = lines[4];
-				String valueHashtag2 = lines[5];
-				String hashtag3 = lines[6];
-				String valueHashtag3 = lines[7];
 				
 				// Generate row key.
 				byte[] key = KeyGenerator.generateKey(timeStamp, lang);
 				Put put = new Put(key);
 				
+				put.add(CF, COL_HASHTAG1, Bytes.toBytes(hashtag1));
+				put.add(CF, COL_FREQ1, Bytes.toBytes(freqHashtag1));
 				
-				/*
-				 * Physically, all column family members are stored together on the filesystem. 
-				 * 
-				 * Try to make do with one column family if you can in your schemas. 
-				 * Only introduce a second and third column family in the case where data access is usually column scoped; 
-				 * i.e. you query one column family or the other but usually not both at the one time.
-				 * 
-				 * 
-				 * 6.3.2.2. Attributes
-				 * Although verbose attribute names (e.g., "myVeryImportantAttribute") are easier to read, prefer shorter attribute names (e.g., "via") to store in HBase.
-				 */
+				// TODO: second and third hashtags can be null?
+				put.add(CF, COL_HASHTAG2, Bytes.toBytes(hashtag2));
+				put.add(CF, COL_FREQ2, Bytes.toBytes(freqHashtag2));
 				
+				put.add(CF, COL_HASHTAG3, Bytes.toBytes(hashtag3));
+				put.add(CF, COL_FREQ3, Bytes.toBytes(freqHashtag3));
 				
-				
+				table2.put(put);
+							
 			}
+			
+			reader.close();
+			table2.close();
 		}
 
 	}
