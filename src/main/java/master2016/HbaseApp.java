@@ -84,62 +84,16 @@ public class HbaseApp {
 		
 
 		if(mode.equals("4")){
+			
+			String tableName = "TABLE_NAME";
+			String familyName = "d";
+			
+			HbaseTable.createTable(tableName, familyName);
+			
+			HTable table = HbaseTable.open(tableName);		
+
 		
-			// Create table and column
-			Configuration conf = HBaseConfiguration.create();
-
-			HBaseAdmin admin = new HBaseAdmin(conf);
-
-			byte[] TABLE = Bytes.toBytes("TABLE_NAME");
-			
-			if(admin.tableExists(TableName.valueOf(TABLE))) {
-					admin.disableTable(TableName.valueOf(TABLE));
-					admin.deleteTable(TableName.valueOf(TABLE));
-			}
-				
-			
-			/*
-			 * Physically, all column family members are stored together on the filesystem. 
-			 * 
-			 * Try to make do with one column family if you can in your schemas. 
-			 * Only introduce a second and third column family in the case where data access is usually column scoped; 
-			 * i.e. you query one column family or the other but usually not both at the one time.
-			 * 
-			 * 
-			 * 6.3.2.2. Attributes
-			 * Although verbose attribute names (e.g., "myVeryImportantAttribute") are easier to read, prefer shorter attribute names (e.g., "via") to store in HBase.
-			 */
-			
-			// * 6.3.2.1. Column Families
-			// * Try to keep the ColumnFamily names as small as possible, preferably one character (e.g. "d" for data/default).
-			byte[] CF = Bytes.toBytes("d");
-			
-			// Column names
-			byte[] COL_HASHTAG1 = Bytes.toBytes("HASHTAG1");
-			byte[] COL_HASHTAG2 = Bytes.toBytes("HASHTAG2");
-			byte[] COL_HASHTAG3 = Bytes.toBytes("HASHTAG3");
-			
-			byte[] COL_FREQ1 = Bytes.toBytes("FREQ1");
-			byte[] COL_FREQ2 = Bytes.toBytes("FREQ2");
-			byte[] COL_FREQ3 = Bytes.toBytes("FREQ3");
-			
-			
-			HTableDescriptor table = new HTableDescriptor(TableName.valueOf(TABLE));
-
-			HColumnDescriptor family = new HColumnDescriptor(CF);
-			// TODO: correct number of max versions allowed.
-			// Definition: limit the number of version of each column
-			family.setMaxVersions(10);  // Default is 3. 
-			table.addFamily(family);			
-				
-			admin.createTable(table);
-			admin.close();
-
-
-			// Open table
-			Configuration conf2 = HBaseConfiguration.create();
-			HConnection conn = HConnectionManager.createConnection(conf2);
-			HTable table2 = new	HTable(TableName.valueOf(TABLE),conn);
+			//byte[] CF = Bytes.toBytes(familyName);
 			
 			// TODO: open the file, for each of the `languages` (lang.out).
 			// TODO: format of the each sentence? (in the example there are spaces).
@@ -173,32 +127,20 @@ public class HbaseApp {
 				
 				
 				// Generate row key.
-				byte[] key = KeyGenerator.generateKey(timeStamp, lang);
-				Put put = new Put(key);
-				
-				put.add(CF, COL_HASHTAG1, Bytes.toBytes(hashtag1));
-				put.add(CF, COL_FREQ1, Bytes.toBytes(freqHashtag1));
-				
-				// TODO: second and third hashtags can be null?
-				put.add(CF, COL_HASHTAG2, Bytes.toBytes(hashtag2));
-				put.add(CF, COL_FREQ2, Bytes.toBytes(freqHashtag2));
-				
-				put.add(CF, COL_HASHTAG3, Bytes.toBytes(hashtag3));
-				put.add(CF, COL_FREQ3, Bytes.toBytes(freqHashtag3));
-				
-				table2.put(put);
+				byte[] key = KeyGenerator.generateKey(timeStamp, lang);				
+				HbaseTable.addRow(table, familyName, key, hashtag1, freqHashtag1, hashtag2, freqHashtag2, hashtag3, freqHashtag3);
 				
 				// DEBUG
 				Get get = new Get(key);
-				Result result = table2.get(get);
+				Result result = table.get(get);
 				
-				byte[] valueResult=result.getValue(CF,  COL_HASHTAG1);
+				byte[] valueResult=result.getValue(Bytes.toBytes(familyName), Bytes.toBytes("HASHTAG1"));
 				System.out.println("Result = " + Bytes.toString(valueResult));
 							
 			}			
 			
 			reader.close();
-			table2.close();
+			table.close();
 		}
 
 	}
