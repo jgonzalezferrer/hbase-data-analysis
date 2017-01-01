@@ -4,7 +4,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 public class KeyGenerator {
 	
-	public byte[] generateKey(String timeStamp, String lang){
+	public static byte[] generateKey(String timeStamp, String lang){
 		/* TODO: discuss the number of bytes.
 		 * Structure of the key:
 		 *  X bytes for timeStamp.

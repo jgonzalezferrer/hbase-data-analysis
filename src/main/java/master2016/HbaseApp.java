@@ -87,7 +87,9 @@ public class HbaseApp {
 			HBaseAdmin admin = new HBaseAdmin(conf);
 
 			byte[] TABLE = Bytes.toBytes("TABLE_NAME");
-			byte[] CF = Bytes.toBytes("DATA_NAME");
+			// * 6.3.2.1. Column Families
+			// * Try to keep the ColumnFamily names as small as possible, preferably one character (e.g. "d" for data/default).
+			byte[] CF = Bytes.toBytes("d");
 
 			// TODO: what happens if the table does already exist?
 			HTableDescriptor table = new HTableDescriptor(TableName.valueOf(TABLE));
@@ -137,9 +139,22 @@ public class HbaseApp {
 				String hashtag3 = lines[6];
 				String valueHashtag3 = lines[7];
 				
-				// TODO: how to combine two keys in order to define the row key.
-				//byte[] key = Bytes.toBytes(lang+timeStamp);
-				//Put put = new Put(key);
+				// Generate row key.
+				byte[] key = KeyGenerator.generateKey(timeStamp, lang);
+				Put put = new Put(key);
+				
+				
+				/*
+				 * Physically, all column family members are stored together on the filesystem. 
+				 * 
+				 * Try to make do with one column family if you can in your schemas. 
+				 * Only introduce a second and third column family in the case where data access is usually column scoped; 
+				 * i.e. you query one column family or the other but usually not both at the one time.
+				 * 
+				 * 
+				 * 6.3.2.2. Attributes
+				 * Although verbose attribute names (e.g., "myVeryImportantAttribute") are easier to read, prefer shorter attribute names (e.g., "via") to store in HBase.
+				 */
 				
 				
 				
