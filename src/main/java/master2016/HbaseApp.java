@@ -17,6 +17,12 @@ import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
+import org.apache.hadoop.hbase.filter.RegexStringComparator;
+import org.apache.hadoop.hbase.filter.RowFilter;
+import org.apache.hadoop.hbase.protobuf.generated.ZooKeeperProtos.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 
 
@@ -81,67 +87,69 @@ public class HbaseApp {
 		languages = args[5];
 		dataFolder = args[6];
 		outputFolder = args[7];
-		
+
 
 		if(mode.equals("4")){
-			
+
 			String tableName = "TABLE_NAME";
 			String familyName = "d";
-			
+
 			HbaseTable.createTable(tableName, familyName);
-			
-			HTable table = HbaseTable.open(tableName);		
 
-		
-			//byte[] CF = Bytes.toBytes(familyName);
-			
-			// TODO: open the file, for each of the `languages` (lang.out).
-			// TODO: format of the each sentence? (in the example there are spaces).
-			String fileName = "en.out";
-			File filePath = new File(dataFolder+"/"+fileName);
-			BufferedReader reader = new BufferedReader(new FileReader(filePath));
+			HTable table = HbaseTable.open(tableName);				
 
-			String line;
-			while((line = reader.readLine()) != null){
-				
-				String[] lines = line.split(",");
-				
-				Long timeStamp = new Long(lines[0]);
-				String lang = lines[1];
-				String hashtag1 = lines[2];
-				String freqHashtag1 = lines[3];
-				String hashtag2 = lines[4];
-				String freqHashtag2 = lines[5];
-				String hashtag3 = lines[6];
-				String freqHashtag3 = lines[7];
-				
-				
-				/* How to select the key?
-				 * 
-				 * 1) Rows in HBase are sorted lexicographically by row key. This design optimizes for scans, 
-				 * allowing you to store related rows, or rows that will be read together, near each other    .
-				 *                     
-				 * 2) If you are not using a filter against rowkey column in your query, your rowkey design may be wrong. 
-				 * The row key should be designed to contain the information you need to find specific subsets of data.
-				 */
-				
-				
-				// Generate row key.
-				byte[] key = KeyGenerator.generateKey(timeStamp, lang);				
-				HbaseTable.addRow(table, familyName, key, hashtag1, freqHashtag1, hashtag2, freqHashtag2, hashtag3, freqHashtag3);
-				
-				// DEBUG
-				Get get = new Get(key);
-				Result result = table.get(get);
-				
-				byte[] valueResult=result.getValue(Bytes.toBytes(familyName), Bytes.toBytes("HASHTAG1"));
-				System.out.println("Result = " + Bytes.toString(valueResult));
-							
-			}			
-			
-			reader.close();
-			table.close();
+			String [] languagesList = languages.split(",");
+			for(int i=0; i<languagesList.length; i++){
+
+				//String fileName = "en.out";
+				String fileName = languagesList[i]+".out";
+				File filePath = new File(dataFolder+"/"+fileName);
+				BufferedReader reader = new BufferedReader(new FileReader(filePath));
+
+				// TODO: format of each sentence? (in the example there are spaces).
+				String line;
+				while((line = reader.readLine()) != null){
+
+					String[] lines = line.split(",");
+
+					Long timeStamp = new Long(lines[0]);
+					String lang = lines[1];
+					String hashtag1 = lines[2];
+					String freqHashtag1 = lines[3];
+					String hashtag2 = lines[4];
+					String freqHashtag2 = lines[5];
+					String hashtag3 = lines[6];
+					String freqHashtag3 = lines[7];
+
+
+					/* How to select the key?
+					 * 
+					 * 1) Rows in HBase are sorted lexicographically by row key. This design optimizes for scans, 
+					 * allowing you to store related rows, or rows that will be read together, near each other    .
+					 *                     
+					 * 2) If you are not using a filter against rowkey column in your query, your rowkey design may be wrong. 
+					 * The row key should be designed to contain the information you need to find specific subsets of data.
+					 */
+
+
+					// Generate row key.
+					byte[] key = KeyGenerator.generateKey(timeStamp, lang);				
+					HbaseTable.addRow(table, familyName, key, hashtag1, freqHashtag1, hashtag2, freqHashtag2, hashtag3, freqHashtag3);
+
+					// DEBUG
+					Get get = new Get(key);
+					Result result = table.get(get);
+
+					byte[] valueResult=result.getValue(Bytes.toBytes(familyName), Bytes.toBytes("HASHTAG1"));
+					System.out.println("Result = " + Bytes.toString(valueResult));
+
+				}			
+
+				reader.close();
+				table.close();
+			}
 		}
+
 
 	}
 }
