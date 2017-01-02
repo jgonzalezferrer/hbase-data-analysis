@@ -80,6 +80,7 @@ public class HbaseApp {
 			return;
 		}
 
+		// TODO: fix the number of parameters depending on the mode.
 		mode = args[0];
 		zkHost = args[1];
 		startTS = args[2];
