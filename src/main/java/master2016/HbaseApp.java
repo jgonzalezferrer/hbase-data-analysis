@@ -92,7 +92,7 @@ public class HbaseApp {
 		String tableName = "TABLE_NAME";
 		String familyName = "d";
 
-				
+
 
 
 		if(mode.equals("4")){
@@ -100,12 +100,9 @@ public class HbaseApp {
 			HbaseTable.createTable(tableName, familyName);
 			HTable table = HbaseTable.open(tableName);	
 
-
-
-
+			// TODO: Change languageList, we cannot use it.
 			for(int i=0; i<languagesList.length; i++){
 
-				//String fileName = "en.out";
 				String fileName = languagesList[i]+".out";
 				File filePath = new File(dataFolder+"/"+fileName);
 				BufferedReader reader = new BufferedReader(new FileReader(filePath));
@@ -142,9 +139,8 @@ public class HbaseApp {
 
 					// DEBUG
 					Get get = new Get(key);
-					Result result = table.get(get);
-
-					byte[] valueResult=result.getValue(Bytes.toBytes(familyName), Bytes.toBytes("HASHTAG1"));
+					Result rs = table.get(get);
+					byte[] valueResult=rs.getValue(Bytes.toBytes(familyName), Bytes.toBytes("HASHTAG1"));
 					System.out.println("Result = " + Bytes.toString(valueResult));
 
 				}			
@@ -156,37 +152,45 @@ public class HbaseApp {
 
 		}
 
-		else if(mode.equals("2")){
+		else if(mode.equals("1") || mode.equals("2") || mode.equals("3")){
 			byte[] startKey = KeyGenerator.generateStartKey(new Long(startTS));
 			byte[] endKey = KeyGenerator.generateEndKey(new Long(endTS));
-
 
 			Scan scan = new Scan(startKey, endKey);
 			HTable table = HbaseTable.open(tableName);
 
-			for(int i=0; i<languagesList.length; i++){
-				String lang = languagesList[i];
-
-				RegexStringComparator endsWithLang = new RegexStringComparator(lang+"$");
-				RowFilter langFilter = new RowFilter(CompareOp.EQUAL, endsWithLang);
-				scan.setFilter(langFilter);
-
-					
+			if(mode.equals("3")){				
 				ResultScanner rs = table.getScanner(scan);
+				debug(rs);
+			}
+			else{
+				for(int i=0; i<languagesList.length; i++){
+					String lang = languagesList[i];
 
-				Result res = rs.next();
-				while (res!=null && !res.isEmpty()){
-					// Do something with the result.
+					// Filter by language.
+					RegexStringComparator endsWithLang = new RegexStringComparator(lang+"$");
+					RowFilter langFilter = new RowFilter(CompareOp.EQUAL, endsWithLang);
+					scan.setFilter(langFilter);
 
-					byte[] valueResult = res.getValue(Bytes.toBytes(familyName), Bytes.toBytes("HASHTAG1"));
-					System.out.println(Bytes.toLong(res.getRow())+Bytes.toString(valueResult));
-					res = rs.next();
-				} 
+					ResultScanner rs = table.getScanner(scan);
+					debug(rs);
+					
+				}
 			}
 			table.close();
-			
-		}
-		
 
+		}
+	}
+	
+	// Method for debugging
+	private static void debug(ResultScanner rs) throws IOException{
+		Result res = rs.next();
+		while (res!=null && !res.isEmpty()){
+			
+			byte[] valueResult = res.getValue(Bytes.toBytes("d"), Bytes.toBytes("HASHTAG1"));
+			System.out.println(Bytes.toLong(res.getRow())+Bytes.toString(valueResult));
+			res = rs.next();
+		} 
+		
 	}
 }
