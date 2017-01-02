@@ -100,7 +100,7 @@ public class HbaseApp {
 			
 			// Get all files with .out extension.
 			File dir = new File(dataFolder);
-			File [] files = dir.listFiles(new FilenameFilter() {
+			File [] outFiles = dir.listFiles(new FilenameFilter() {
 			    @Override
 			    public boolean accept(File dir, String name) {
 			        return name.endsWith(".out");
@@ -110,10 +110,8 @@ public class HbaseApp {
 			HbaseTable.createTable(tableName, familyName);
 			HTable table = HbaseTable.open(tableName);	
 
-			for(int i=0; i<files.length; i++){
-
-				File filePath = files[i];
-				BufferedReader reader = new BufferedReader(new FileReader(filePath));
+			for(int i=0; i<outFiles.length; i++){
+				BufferedReader reader = new BufferedReader(new FileReader(outFiles[i]));
 
 				// TODO: format of each sentence? (in the example there are spaces).
 				String line;
