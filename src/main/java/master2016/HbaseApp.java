@@ -3,6 +3,7 @@ package master2016;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -96,15 +97,22 @@ public class HbaseApp {
 
 
 		if(mode.equals("4")){
+			
+			// Get all files with .out extension.
+			File dir = new File(dataFolder);
+			File [] files = dir.listFiles(new FilenameFilter() {
+			    @Override
+			    public boolean accept(File dir, String name) {
+			        return name.endsWith(".out");
+			    }
+			});
 
 			HbaseTable.createTable(tableName, familyName);
 			HTable table = HbaseTable.open(tableName);	
 
-			// TODO: Change languageList, we cannot use it.
-			for(int i=0; i<languagesList.length; i++){
+			for(int i=0; i<files.length; i++){
 
-				String fileName = languagesList[i]+".out";
-				File filePath = new File(dataFolder+"/"+fileName);
+				File filePath = files[i];
 				BufferedReader reader = new BufferedReader(new FileReader(filePath));
 
 				// TODO: format of each sentence? (in the example there are spaces).
