@@ -74,38 +74,32 @@ public class HbaseApp {
 	private static String outputFolder; 
 	public static void main( String[] args ) throws IOException  {
 
-		// The number of arguments must be exactly 8.
-		if (args.length != 8){
-			System.err.println("Error in number of parameters");
+		// If we do not use at least 3 parameters.
+		if (args.length != 7 || args.length != 6 || args.length != 3){
+			System.err.println("Error in number of parameters."
+					+ " You need to use 7 parameters for mode 1 and 2"
+					+ ", or, you need to use 6 paramaters for mode 3"
+					+ ", or, you need to use 3 parameters for mode 4");
 			return;
 		}
 
-		// TODO: fix the number of parameters depending on the mode.
 		mode = args[0];
 		zkHost = args[1];
-		startTS = args[2];
-		endTS = args[3];
-		N = args[4];
-		languages = args[5];
-		String [] languagesList = languages.split(",");
-		dataFolder = args[6];
-		outputFolder = args[7];
 
 		String tableName = "TABLE_NAME";
 		String familyName = "d";
 
-
-
-
 		if(mode.equals("4")){
 			
+			dataFolder = args[2];
+
 			// Get all files with .out extension.
 			File dir = new File(dataFolder);
 			File [] outFiles = dir.listFiles(new FilenameFilter() {
-			    @Override
-			    public boolean accept(File dir, String name) {
-			        return name.endsWith(".out");
-			    }
+				@Override
+				public boolean accept(File dir, String name) {
+					return name.endsWith(".out");
+				}
 			});
 
 			HbaseTable.createTable(tableName, familyName);
@@ -158,8 +152,24 @@ public class HbaseApp {
 			table.close();
 
 		}
-
 		else if(mode.equals("1") || mode.equals("2") || mode.equals("3")){
+
+			startTS = args[2];
+			endTS = args[3];
+			N = args[4];
+			
+			// Used in modes 1 and 2.
+			String [] languagesList = null;
+
+			if(mode.equals("3")){// We do not have languages in the argument.
+				outputFolder = args[5];
+			}
+			else{
+				languages = args[5];
+				languagesList = languages.split(",");
+				outputFolder = args[6];
+			}
+
 			byte[] startKey = KeyGenerator.generateStartKey(new Long(startTS));
 			byte[] endKey = KeyGenerator.generateEndKey(new Long(endTS));
 
@@ -181,23 +191,23 @@ public class HbaseApp {
 
 					ResultScanner rs = table.getScanner(scan);
 					debug(rs);
-					
+
 				}
 			}
 			table.close();
 
 		}
 	}
-	
+
 	// Method for debugging
 	private static void debug(ResultScanner rs) throws IOException{
 		Result res = rs.next();
 		while (res!=null && !res.isEmpty()){
-			
+
 			byte[] valueResult = res.getValue(Bytes.toBytes("d"), Bytes.toBytes("HASHTAG1"));
 			System.out.println(Bytes.toLong(res.getRow())+Bytes.toString(valueResult));
 			res = rs.next();
 		} 
-		
+
 	}
 }
