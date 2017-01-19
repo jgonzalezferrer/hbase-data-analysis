@@ -86,7 +86,7 @@ public class HbaseApp {
 		mode = args[0];
 		zkHost = args[1];
 
-		String tableName = "TABLE_NAME";
+		String tableName = "twitterStats";
 		String familyName = "d";
 
 		if(mode.equals("4")){

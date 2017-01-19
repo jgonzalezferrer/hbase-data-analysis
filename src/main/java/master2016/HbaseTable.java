@@ -65,7 +65,7 @@ public class HbaseTable {
 		HColumnDescriptor family = new HColumnDescriptor(CF);
 		// TODO: correct number of max versions allowed.
 		// Definition: limit the number of version of each column
-		family.setMaxVersions(10);  // Default is 3. 
+		// Default number of versions is 3. 
 		table.addFamily(family);			
 
 		admin.createTable(table);
