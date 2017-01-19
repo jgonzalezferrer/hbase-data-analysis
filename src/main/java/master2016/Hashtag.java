@@ -18,5 +18,8 @@ public class Hashtag {
 		return this.count;
 	}
 	
+	public void incrementCount(int addCount){
+		this.count+=addCount;
+	}
 
 }
