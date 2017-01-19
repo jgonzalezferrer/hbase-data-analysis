@@ -75,7 +75,7 @@ public class HbaseApp {
 	public static void main( String[] args ) throws IOException  {
 
 		// If we do not use at least 3 parameters.
-		if (args.length != 7 || args.length != 6 || args.length != 3){
+		if (args.length != 7 && args.length != 6 && args.length != 3){
 			System.err.println("Error in number of parameters."
 					+ " You need to use 7 parameters for mode 1 and 2"
 					+ ", or, you need to use 6 paramaters for mode 3"
