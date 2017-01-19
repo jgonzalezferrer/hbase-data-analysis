@@ -3,10 +3,13 @@ package master2016;
 public class Hashtag implements Comparable<Hashtag>{
 
 	private String text;
+	private String lang;
 	private int count;
+	
 
-	public Hashtag (String text, int count){
+	public Hashtag (String text, String lang, int count){
 		this.text=text;
+		this.lang=lang;
 		this.count=count;
 	}
 
@@ -14,6 +17,10 @@ public class Hashtag implements Comparable<Hashtag>{
 		return this.text;
 	}
 
+	public String getLang(){
+		return this.lang;
+	}
+	
 	public int getCount(){
 		return this.count;
 	}
@@ -34,7 +41,7 @@ public class Hashtag implements Comparable<Hashtag>{
 		else{
 			String s1 = this.text;
 			String s2 = o.getText();
-			return s1.compareTo(s2);   	
+			return s2.compareTo(s1);   	
 		}
 	}
 }
