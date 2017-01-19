@@ -1,5 +1,12 @@
 package master2016;
 
+/** Hashtag: storing the text, language and number of occurrences of a given hashtag.
+ * 
+ * @param text, text of the hashtag
+ * @param lang, language of the hashtag
+ * @param count, number of occurrences of the hashtag
+ *  
+ */
 public class Hashtag implements Comparable<Hashtag>{
 
 	private String text;
@@ -25,10 +32,19 @@ public class Hashtag implements Comparable<Hashtag>{
 		return this.count;
 	}
 	
+	/* Incremets the number of occurrences of the hashtag
+	 * 
+	 * @param addCount, number of count to update.
+	 * 
+	 */
 	public void incrementCount(int addCount){
 		this.count+=addCount;
 	}
 
+	/* compareTo overrided to define a new total ordering.
+	 * 
+	 * It first order by value, then it order alphabetically.
+	 */
 	@Override
 	public int compareTo(Hashtag o) {
 		// TODO Auto-generated method stub
