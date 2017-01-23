@@ -240,7 +240,9 @@ public class HbaseApp {
 		Collections.sort(sortedRank, Collections.reverseOrder());
 
 		// Return just the first N elements.
-		return sortedRank.subList(0, N);
+		// If there are less than N elements in the ranking, return all the elements.
+		return sortedRank.subList(0, N > sortedRank.size() ? sortedRank.size() : N);
+		
 		
 	}
 	
