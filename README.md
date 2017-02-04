@@ -20,7 +20,7 @@ Dependencies:
 
 Instructions on how to execute
 ----------- 
-The application has been configured and compiled with the ````appassembler```` maven plugin. According to the ````mode`````parameter, the script will be used with the following parameters:
+The application has been configured and compiled with the ````appassembler```` maven plugin. According to the ````mode```` parameter, the script will be used with the following parameters:
 
 ````
 $ mvn clean install
