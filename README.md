@@ -1,6 +1,6 @@
 # hbaseApp
 
-The goal of this project is to develop Java application that stores trending topics from Twitter into HBase and provides users with a set of queries for data analysis.	
+The goal of this project is to develop Java application that stores trending topics from Twitter into HBase and provides users with a set of queries for data analysis.	The application is able to run in a distributed environment.
 
 The trending topics to load in HBase are stored	into text files	with the following format:
 
@@ -40,3 +40,10 @@ where:
 * ````language````: a csv list of languages.
 * ````dataFolder````: path to the folder containing the files with the trending topics.
 * ````outputFolder````: path to the folder where the files with the query results are stored.
+
+Description of the queries
+----------- 
+
+1. Given a language, find the Top-N most used words for the given language in a time interval defined with a start and end timestamp. 
+2. Find the list of Top-N most used words for each language in a time interval defined with a start and end timestamp. 
+3. Find the Top-N most used words and the frequency of each word regardless the language in a time interval defined with a start and end timestamp. 
