@@ -25,9 +25,9 @@ The application has been configured and compiled with the ````appassembler```` m
 ````
 $ mvn clean install
 $ target/appassembler/bin/hbaseApp.sh mode zkHost dataFolder	# Load
-$ target/appassembler/bin/hbaseApp.sh mode zkHost startTS end TS N language outputFolder	# Query1
-$ target/appassembler/bin/hbaseApp.sh mode zkHost startTs end TS N language outputFolder	# Query2
-$ target/appassembler/bin/hbaseApp.sh mode zkHost startTs endTs N outputFolder	# Query3
+$ target/appassembler/bin/hbaseApp.sh mode zkHost startTS endTS N language outputFolder	# Query1
+$ target/appassembler/bin/hbaseApp.sh mode zkHost startTS endTS N language outputFolder	# Query2
+$ target/appassembler/bin/hbaseApp.sh mode zkHost startTS endTS N outputFolder	# Query3
 ````
 
 where:
